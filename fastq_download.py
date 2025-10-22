@@ -83,3 +83,20 @@ for sra_id in sra_numbers:
 
     os.chdir("../..")
     print(f"Finished {sra_id}")
+
+for sra_id in sra_numbers:
+
+    # Go to sra sub folder
+    os.chdir(sra_id)
+    print("Downloaded SRA files directory:", os.getcwd())
+
+    patterns = sra_id + ".sra"
+    file = sorted(glob.glob(patterns))
+
+    if not file:
+        print("No sra file exist!!", patterns)
+    else:
+        for f in file:
+            subprocess.run(["rm", f])
+            print("Deleted downloaded SRR files")
+    os.chdir("..")
