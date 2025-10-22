@@ -28,3 +28,12 @@ for sra_id in sra_numbers:
     time_taken = (end - start) / 60
 
     print(f"Time taken to download a sra file {sra_id}", f"{time_taken:.2f}")
+
+for sra_id in sra_numbers:
+    
+    if len(sra_id) > 0:
+        print("List of files downloaded:")
+        subprocess.run(["tree", "-rh"])
+        break
+    else:
+        print("No fastq file downloaded")
