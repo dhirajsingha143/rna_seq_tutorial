@@ -1,6 +1,7 @@
 import subprocess
 import time
 import os
+import glob
 
 # SRA files list
 sra_numbers = ["SRR7179504","SRR7179541"]
@@ -17,6 +18,7 @@ os.chdir("sra_files")
 # Downloading files in new directory
 print("Downloading files in:", os.getcwd())
 
+# Downloading SRA files
 for sra_id in sra_numbers:
 
     print("Downloading SRA files")
@@ -29,6 +31,7 @@ for sra_id in sra_numbers:
 
     print(f"Time taken to download a sra file {sra_id}", f"{time_taken:.2f}")
 
+# Checking files directory
 for sra_id in sra_numbers:
     
     if len(sra_id) > 0:
@@ -38,6 +41,7 @@ for sra_id in sra_numbers:
     else:
         print("No fastq file downloaded")
 
+# Converting to FASTQ files for both ends if available
 for sra_id in sra_numbers:
 
     os.chdir(sra_id)
@@ -50,3 +54,32 @@ for sra_id in sra_numbers:
     print("Time taken to generate FASTQ:", f"{time_taken:.2f} minutes")
     subprocess.run(["ls", "-lh"])
     os.chdir("..")
+
+# Zipping the fastq files and deleting it
+for sra_id in sra_numbers:
+    
+    # Go to sra sub folder
+    os.chdir(sra_id)
+    print("Downloaded SRA files directory:", os.getcwd())
+
+    # navigate to the folder containing fastq files
+    os.chdir("fastq_files")
+    print("FASTQ file directory:", os.getcwd())
+
+    patterns = sra_id + "_*.fastq"
+    file = sorted(glob.glob(patterns))
+
+    if not file:
+            print("No file found:", patterns)
+    else:
+        for f in file:
+            start = time.time()
+            print("zipping", f)
+            subprocess.run(["gzip", f], check=True)
+            end = time.time()
+            time_taken = (end - start) / 60
+            print("Time taken to zip FASTQ files:", f"{time_taken:.2f} minutes")
+            subprocess.run(["ls", "-lh"])
+
+    os.chdir("../..")
+    print(f"Finished {sra_id}")
