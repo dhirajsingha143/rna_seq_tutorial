@@ -37,3 +37,16 @@ for sra_id in sra_numbers:
         break
     else:
         print("No fastq file downloaded")
+
+for sra_id in sra_numbers:
+
+    os.chdir(sra_id)
+    print("SRA file directory:", os.getcwd())
+    print("Generating FASTQ for:", sra_id)
+    start = time.time()
+    subprocess.run(["fasterq-dump", f"{sra_id}.sra", "-O", "fastq_files", "--split-files"])
+    end = time.time()
+    time_taken = (end - start) / 60
+    print("Time taken to generate FASTQ:", f"{time_taken:.2f} minutes")
+    subprocess.run(["ls", "-lh"])
+    os.chdir("..")
