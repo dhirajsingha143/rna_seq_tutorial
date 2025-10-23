@@ -150,7 +150,6 @@ for sra_id in sra_numbers:
     os.chdir("../..")
     print(f"✅ Finished moving {sra_id} FASTQs\n{'-'*60}")
 
---
 # MultiQC
 
 # Move up one directory (from inside sra_files or fastq folder)
