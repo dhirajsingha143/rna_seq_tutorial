@@ -121,7 +121,7 @@ for sra_id in sra_numbers:
 
 # Destination change of zipped fastq files
 cwd = os.getcwd()
-dest_dir = os.path.abspath(os.path.join(cwd, "../clean_fastq"))
+dest_dir = os.path.abspath(os.path.join(cwd, "../QC_zip"))
 os.makedirs(dest_dir, exist_ok=True)
 print("Destination directory:", dest_dir)
 
@@ -136,7 +136,7 @@ for sra_id in sra_numbers:
     print("FASTQ file directory:", os.getcwd())
 
     # Move all fastq.gz files to clean_fastq folder (2 levels up)
-    fastq_files = glob.glob(f"{sra_id}*fastq.gz")
+    fastq_files = glob.glob(f"{sra_id}*fastqc.zip")
 
     if not fastq_files:
         print(f"⚠️ No FASTQ files found for {sra_id}. Skipping...")
@@ -149,4 +149,17 @@ for sra_id in sra_numbers:
     # Return two directories back for next loop
     os.chdir("../..")
     print(f"✅ Finished moving {sra_id} FASTQs\n{'-'*60}")
+
+--
+# MultiQC
+
+# Move up one directory (from inside sra_files or fastq folder)
+os.chdir("..")           
+# Create folder if not exists                
+os.makedirs("MultiQC_report", exist_ok=True)  
+# Print current working directory
+print(os.getcwd())                      
+
+subprocess.run(["multiqc", "QC_zip/", "-o", "MultiQC_report/"])  
+print("MultiQC report generated in:", os.getcwd())
 
