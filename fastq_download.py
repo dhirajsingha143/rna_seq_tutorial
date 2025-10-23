@@ -4,7 +4,7 @@ import os
 import glob
 
 # SRA files list
-sra_numbers = ["SRR7179504","SRR7179541"]
+sra_numbers = ["SRR7179508", "SRR7179541"]
 
 # Current working directory
 print("Current Working directory:", os.getcwd())
@@ -66,7 +66,7 @@ for sra_id in sra_numbers:
     os.chdir("fastq_files")
     print("FASTQ file directory:", os.getcwd())
 
-    patterns = sra_id + "_*.fastq"
+    patterns = sra_id + "*.fastq"
     file = sorted(glob.glob(patterns))
 
     if not file:
@@ -118,3 +118,35 @@ for sra_id in sra_numbers:
         print("Time taken for quality control:", f"{time_taken:.2f} minutes")
 
         os.chdir("../..")
+
+# Destination change of zipped fastq files
+cwd = os.getcwd()
+dest_dir = os.path.abspath(os.path.join(cwd, "../clean_fastq"))
+os.makedirs(dest_dir, exist_ok=True)
+print("Destination directory:", dest_dir)
+
+# Loop through each SRA ID
+for sra_id in sra_numbers:
+    # Go into SRA subfolder
+    os.chdir(sra_id)
+    print("\nSRA file directory:", os.getcwd())
+
+    # Go into fastq_files subfolder
+    os.chdir("fastq_files")
+    print("FASTQ file directory:", os.getcwd())
+
+    # Move all fastq.gz files to clean_fastq folder (2 levels up)
+    fastq_files = glob.glob(f"{sra_id}*fastq.gz")
+
+    if not fastq_files:
+        print(f"⚠️ No FASTQ files found for {sra_id}. Skipping...")
+    else:
+        for file in fastq_files:
+            src = os.path.abspath(file)
+            print(f"Moving {src} → {dest_dir}")
+            subprocess.run(["mv", src, dest_dir], check=True)
+
+    # Return two directories back for next loop
+    os.chdir("../..")
+    print(f"✅ Finished moving {sra_id} FASTQs\n{'-'*60}")
+
