@@ -100,3 +100,21 @@ for sra_id in sra_numbers:
             subprocess.run(["rm", f])
             print("Deleted downloaded SRR files")
     os.chdir("..")
+
+for sra_id in sra_numbers:
+
+    os.chdir(sra_id)
+    print("SRA file directory:", os.getcwd())
+
+    os.chdir("fastq_files")
+    print("FASTQ file directory:", os.getcwd())
+
+    for f in glob.glob(f"{sra_id}*.fastq.gz"):
+        print("Quality control for:", f)
+        start = time.time()
+        subprocess.run(["fastqc", f])
+        end = time.time()
+        time_taken = (end - start) / 60
+        print("Time taken for quality control:", f"{time_taken:.2f} minutes")
+
+        os.chdir("../..")
