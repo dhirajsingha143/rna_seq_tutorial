@@ -43,3 +43,65 @@ for sra_id in sra_numbers:
         time_taken = (end - start) / 60
         print(f"Time taken to trim file {f}:", f"{time_taken:.2f} minutes")
         os.chdir("../..")
+
+for sra_id in sra_numbers:
+
+    os.chdir(sra_id)
+    print("SRA file directory:", os.getcwd())
+
+    os.chdir("fastq_files")
+    print("FASTQ file directory:", os.getcwd())
+
+    for f in glob.glob(f"{sra_id}_trimmed.fastq.gz"):
+        print("Quality control for:", f)
+        start = time.time()
+        subprocess.run(["fastqc", f])
+        end = time.time()
+        time_taken = (end - start) / 60
+        print("Time taken for quality control:", f"{time_taken:.2f} minutes")
+
+        os.chdir("../..")
+
+# Destination change of zipped fastq files
+cwd = os.getcwd()
+dest_dir = os.path.abspath(os.path.join(cwd, "../QCT_zip"))
+os.makedirs(dest_dir, exist_ok=True)
+print("Destination directory:", dest_dir)
+
+# Loop through each SRA ID
+for sra_id in sra_numbers:
+    # Go into SRA subfolder
+    os.chdir(sra_id)
+    print("\nSRA file directory:", os.getcwd())
+
+    # Go into fastq_files subfolder
+    os.chdir("fastq_files")
+    print("FASTQ file directory:", os.getcwd())
+
+    # Move all fastq.gz files to clean_fastq folder (2 levels up)
+    fastq_files = glob.glob(f"{sra_id}*fastqc.zip")
+
+    if not fastq_files:
+        print(f"⚠️ No FASTQ files found for {sra_id}. Skipping...")
+    else:
+        for file in fastq_files:
+            src = os.path.abspath(file)
+            print(f"Moving {src} → {dest_dir}")
+            subprocess.run(["mv", src, dest_dir], check=True)
+
+    # Return two directories back for next loop
+    os.chdir("../..")
+    print(f"✅ Finished moving {sra_id} FASTQs\n{'-'*60}")
+
+# MultiQC
+
+# Move up one directory (from inside sra_files or fastq folder)
+os.chdir("..")           
+# Create folder if not exists                
+os.makedirs("MultiQCT_report", exist_ok=True)  
+# Print current working directory
+print(os.getcwd())                      
+
+subprocess.run(["multiqc", "QCT_zip/", "-o", "MultiQCT_report/"])
+print("MultiQCT report generated in:", os.getcwd())
+
