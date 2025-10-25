@@ -10,42 +10,6 @@ sra_numbers = ["SRR7179508", "SRR7179541"]
 print("Current Working directory:", os.getcwd())
 
 
-# Defined paths
-reference_dir = "reference"
-gtf_file = os.path.join(reference_dir, "Homo_sapiens.GRCh38.114.gtf.gz")
-
-download_url = "ftp://ftp.ensembl.org/pub/release-114/gtf/homo_sapiens/Homo_sapiens.GRCh38.114.gtf.gz"
-
-# Create reference directory if it doesn't exist
-os.makedirs(reference_dir, exist_ok=True)
-
-# Check if GTF file exists, if not download it
-if not os.path.exists(gtf_file):
-    print(f"[INFO] GTF file not found. Downloading from:\n {download_url}")
-    try:
-        subprocess.run(["wget", download_url])
-        print("[Success] Download completed.")
-    except Exception as e:
-        print(f"[Error] Download failed: {e}")
-        exit(1)
-else:
-    print("[INFO] GTF file already exists. Skipping download.")
-
-# Check if extracted directory exists, if not — extract it
-if not os.path.exists(extracted_dir):
-    print(f"[INFO] Extracting {tar_file} to {extracted_dir} ...")
-    try:
-        subprocess.run(["gunzip", gtf_file], check=True)
-        print(f"[SUCCESS] Extracted to: {extracted_dir}")
-    except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Extraction failed: {e}")
-        exit(1)
-else:
-    print(f"[OK] Found existing extracted index directory: {extracted_dir}")
-
-print("\n✅ Samtools GTF file setup is complete.\n")
-
-
 # Sorting files alignment files by running samtools
 
 # Change to new directory created
