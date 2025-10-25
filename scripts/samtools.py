@@ -31,6 +31,18 @@ if not os.path.exists(gtf_file):
 else:
     print("[INFO] GTF file already exists. Skipping download.")
 
+# Check if extracted directory exists, if not — extract it
+if not os.path.exists(extracted_dir):
+    print(f"[INFO] Extracting {tar_file} to {extracted_dir} ...")
+    try:
+        subprocess.run(["gunzip", gtf_file], check=True)
+        print(f"[SUCCESS] Extracted to: {extracted_dir}")
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Extraction failed: {e}")
+        exit(1)
+else:
+    print(f"[OK] Found existing extracted index directory: {extracted_dir}")
+
 print("\n✅ Samtools GTF file setup is complete.\n")
 
 
@@ -62,3 +74,24 @@ for sra_id in sra_numbers:
         time_taken = (end - start) / 60
         print(f"Time taken to align file {f}:", f"{time_taken:.2f} minutes")
         os.chdir("..")
+
+# Indexing files alignment files by running samtools
+for sra_id in sra_numbers:
+
+    os.chdir(sra_id)
+    print(os.getcwd())
+
+    for f in glob.glob(f"{sra_id}_trimmed.sorted.bam"):
+        print("Indexing using samtools for:", f)
+        start = time.time()
+        output_bai = f"{f}.bai"
+
+        print(f"[INFO] Indexing {f} to {output_bai} ...")
+
+        subprocess.run(["samtools", "index", f])
+
+        end = time.time()
+        time_taken = (end - start) / 60
+        print(f"Time taken to index file {f}:", f"{time_taken:.2f} minutes")
+
+    os.chdir("..")
